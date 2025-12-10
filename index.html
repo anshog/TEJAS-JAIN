@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DoodleDream</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Fredoka', 'sans-serif'],
+            },
+            colors: {
+              brand: {
+                teal: '#2dd4bf',
+                yellow: '#facc15',
+                purple: '#a855f7',
+                pink: '#ec4899',
+                blue: '#3b82f6',
+                background: '#5eead4', // Vibrant Teal base
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Fredoka', sans-serif;
+        background-color: #5eead4;
+        background-image: 
+          radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.2) 0%, transparent 20%),
+          radial-gradient(circle at 90% 80%, rgba(255, 255, 255, 0.2) 0%, transparent 20%);
+        overflow-x: hidden;
+        margin: 0;
+        min-height: 100vh;
+      }
+      
+      /* Decorative background shapes */
+      .bg-shape {
+        position: fixed;
+        z-index: -2; /* Moved further back to allow snow in between if needed */
+        pointer-events: none;
+      }
+
+      /* Snow effect */
+      .snowflake {
+        position: fixed;
+        top: -20px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1; /* Behind content, in front of shapes */
+        animation: snowfall linear infinite;
+        filter: blur(1px);
+        will-change: transform;
+      }
+
+      @keyframes snowfall {
+        0% {
+          transform: translateY(-10vh) translateX(0);
+        }
+        25% {
+          transform: translateY(25vh) translateX(20px);
+        }
+        50% {
+          transform: translateY(50vh) translateX(-20px);
+        }
+        75% {
+          transform: translateY(75vh) translateX(20px);
+        }
+        100% {
+          transform: translateY(110vh) translateX(0);
+        }
+      }
+
+      /* Custom cursor for coloring */
+      .cursor-brush {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10.66a6 6 0 1 1-11.85-2.26 6 6 0 0 1 1.76-7.86 4 4 0 0 1 6.84 0 6 6 0 0 1 3.25 10.12Z"/><path d="m14 14 2.5 2.5"/><path d="m17.5 17.5 3 3"/><path d="m11 11-8 8"/></svg>') 0 24, auto;
+      }
+
+      .cursor-bucket {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2c.8.8 2 .8 2.8 0L19 11Z"/><path d="m5 2 5 5"/><path d="M2 13h15"/><path d="M22 16.65c-1.35-1.12-3.15-1.58-4.88-.67a4.99 4.99 0 0 0-2.3 2.54"/></svg>') 0 24, auto;
+      }
+      
+      /* 3D Button Utility */
+      .btn-3d {
+        transition: all 0.1s;
+        position: relative;
+        top: 0;
+      }
+      .btn-3d:active {
+        top: 4px;
+        box-shadow: none !important;
+        border-bottom-width: 0px !important;
+        margin-bottom: 4px; /* Maintain layout space */
+      }
+      
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.1);
+        border-radius: 20px;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.32.0",
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "react": "https://esm.sh/react@^19.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.559.0"
+  }
+}
+</script>
+</head>
+  <body class="text-slate-800 antialiased selection:bg-pink-200">
+    <!-- Decorative Floating Shapes -->
+    <div class="bg-shape top-[-5%] left-[-5%] w-64 h-64 rounded-full bg-yellow-300 opacity-80 mix-blend-multiply animate-pulse"></div>
+    <div class="bg-shape bottom-[-10%] right-[-5%] w-96 h-96 rounded-full bg-purple-300 opacity-60 mix-blend-multiply"></div>
+    <div class="bg-shape top-[20%] right-[10%] w-32 h-32 rotate-12 bg-pink-400 rounded-3xl opacity-40"></div>
+    <div class="bg-shape bottom-[30%] left-[5%] w-24 h-24 rounded-full border-8 border-white opacity-20"></div>
+    <div class="bg-shape top-[40%] left-[40%] w-16 h-16 bg-blue-400 rounded-full opacity-30 animate-bounce" style="animation-duration: 3s;"></div>
+    
+    <div id="root"></div>
+
+    <!-- Snow Generation Script -->
+    <script>
+      (function() {
+        const snowCount = 40;
+        const fragment = document.createDocumentFragment();
+        
+        for(let i=0; i<snowCount; i++) {
+          const el = document.createElement('div');
+          el.classList.add('snowflake');
+          
+          // Randomize positioning and size
+          el.style.left = Math.random() * 100 + 'vw';
+          const size = Math.random() * 8 + 4 + 'px'; // 4px to 12px
+          el.style.width = size;
+          el.style.height = size;
+          
+          // Randomize animation
+          const duration = Math.random() * 5 + 6; // 6s to 11s duration
+          el.style.animationDuration = duration + 's';
+          el.style.animationDelay = (Math.random() * -15) + 's'; // Start at random times
+          
+          // Randomize opacity
+          el.style.opacity = Math.random() * 0.4 + 0.3;
+          
+          fragment.appendChild(el);
+        }
+        
+        document.body.appendChild(fragment);
+      })();
+    </script>
+  </body>
+</html>
